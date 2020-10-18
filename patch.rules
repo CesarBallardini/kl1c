@@ -1,0 +1,10 @@
+--- debian/rules.orig	2020-10-18 22:08:37.963228490 +0000
++++ debian/rules	2020-10-18 22:09:48.511230772 +0000
+@@ -27,6 +27,7 @@
+ 	cd $(KDIR) && patch -p1 < ../debian/patch2.gcc-4.0-aj-lamont
+ 	cd $(KDIR) && patch -p1 < ../debian/patch3.suppress-mktemp-warning
+ 	cd $(KDIR) && patch -p1 < ../debian/patch4.configure-sh-space
++	cd $(KDIR) && patch -p1 < ../debian/patch5.configure-bcmp
+ 
+ 	chmod +x debian/configure.expect
+ 	cd $(KDIR) && ../debian/configure.expect

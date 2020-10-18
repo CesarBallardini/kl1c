@@ -1,0 +1,21 @@
+--- debian/configure.expect.orig	2020-10-18 18:27:25.960435875 +0000
++++ debian/configure.expect		2020-10-17 23:45:55.000000000 +0000
+@@ -17,11 +17,14 @@
+ expect "Which user command directory to use?" { send "\n" }
+ expect "Which library directory to use?" { send "\n" }
+ expect "Which include file directory to use?" { send "\n" }
+-expect "Do you want to change the default?  (yes or no)" { send "\n" }
++expect "Do you want to change the default?  (yes or no)" { send "yes\n" }
++expect "Do you want to delete any of them?  (yes or no)" { send "no\n" }
++expect "Specify additions if any:" { send "/usr/lib/i386-linux-gnu/\n" }
++expect "More?" { send "\n" }
+ expect "Which default include file directory directory to use?" { send "\n" }
+-expect "Do you want to change the default?  (yes or no)" { send "\n" }
+-expect "Do you want to change the default?  (yes or no)" { send "\n" }
++expect "Do you want to change the default?  (yes or no)" { send "no\n" }
++expect "Do you want to change the default?  (yes or no)" { send "no\n" }
+ expect "Do you want to use X-based multi-window tracer? (yes or no)" { send "yes\n" }
+ expect "Which Terminal program for X to use?" { send "/usr/bin/x-terminal-emulator\n" }
+-expect "Which default parallelism in installation to use?" { send "\n" }
++expect "default parallelism in installation" { send "0\n" }
+ expect "eof"

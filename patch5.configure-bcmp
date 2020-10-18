@@ -1,0 +1,19 @@
+--- klic-3.003/Configure.orig	2020-10-18 20:24:10.295506086 +0000
++++ klic-3.003/Configure	2020-10-18 20:25:27.043507211 +0000
+@@ -959,10 +959,13 @@
+ test_label setitimer USETIMER
+ test_label nrand48 USENRAND48
+ test_label isastream USEISASTREAM
+-test_either bcmp memcmp USEBCMP
++#test_either bcmp memcmp USEBCMP
++USEBCMP="#define"
+ test_either bcopy memcpy USEBCOPY
+-test_either bzero memset USEBZERO
+-test_either strchr index USESTRCHR
++#test_either bzero memset USEBZERO
++USEBZERO="#define"
++#test_either strchr index USESTRCHR
++USESTRCHR="#define"
+ test_either usleep sleep USEUSLEEP
+ 
+ # sys_errlist

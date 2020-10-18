@@ -1,0 +1,24 @@
+/* 
+pp. 297 
+(Lecture Notes in Computer Science 1630 _ Lecture Notes in Artificial Intelligence)
+Matthew M. Huntbach, Graem A. Ringwood (auth.)
+Agent-Oriented Programming_ From Prolog to Guarded Definite Clauses.pdf
+*/
+
+
+:- module main.
+
+main :- qsort([3,5,2,1,4,2,7,8,6,9], X), io:outstream([print(X), nl]).
+
+
+qsort([],B) :- B=[].
+qsort([P|L],B) 
+    :- part(L,P,S,G), append(SS,[H|SG],B),
+       qsort(S,SS), qsort(G,GG).
+
+part([],P,S,G)    :- S=[], G=[].
+part([H|T],P,S,G) :- H=<P        | part(T,P,S1,G), S=[H|S1].
+part([H|T],P,S,G) :- H>P         | part(T,P,S,G1), G=[H|G1].
+
+append([],Y,Z)    :- Z=Y.
+append([H|T],Y,Z) :-               append(T,Y,W), Z=[H|W].
