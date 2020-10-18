@@ -46,8 +46,6 @@ Los paquetes quedan en el directorio  `/home/vagrant/deb/` (eso es dentro de la 
 * descargamos una réplica del software libre de ICOT (ifs: ICOT Free Software) desde su DVD online; desde 2005 hasta al menos octubre de 2020. Ocupa unos 122 MB con más software que solamente klic.
 
 ```bash
-mkdir descargas/
-pushd descargas/
 wget --tries=inf --timestamping --recursive --level=inf --convert-links --page-requisites --no-parent -R '\?C=' https://www.ueda.info.waseda.ac.jp/AITEC_ICOT_ARCHIVES/ICOT/ifs/
 popd
 
@@ -58,6 +56,9 @@ wget --tries=inf --timestamping --recursive --level=inf --convert-links --page-r
 ```
 
 # Apéndice: Referencias
+
+* https://www.ueda.info.waseda.ac.jp/software.html [revived!] KLIC: Portable implementation of KL1 (version 3.012) Ubuntu 18.04LTS REVISAR PARA CONTINUAR!!!
+
 
 * https://en.wikipedia.org/wiki/Fifth_generation_computer Antes las generaciones tenían que ver con la electrónica: válvulas de vacío, transistores, circuitos integrados.  Ahora las generaciones tienen que ver con los lenguajes que usamos para comunicarnos con la computadora.
 
@@ -79,7 +80,7 @@ wget --tries=inf --timestamping --recursive --level=inf --convert-links --page-r
   * https://web.archive.org/web/20100110085645/http://www.klic.org/ no se actualizan las listas de correo desde setiembre del 2000
 
 
-* https://github.com/GunterMueller/KLIC Después de hacer todo el trabajo, encontré este otro repo que al parecer ya lo tiene funcionando.  No lo miré, lo anoto para ver otro día.
+* https://github.com/GunterMueller/KLIC Después de hacer todo el trabajo, encontré este otro repo que al parecer ya lo tiene funcionando.  No lo miré, lo anoto para ver otro día. Mi fork en https://github.com/CesarBallardini/KLIC
 
 
 
