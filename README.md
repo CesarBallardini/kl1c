@@ -19,7 +19,7 @@ vagrant reload
 # instalamos los paquetes
 vagrant ssh  #  ingresamos a la VM
 
-
+cd /vagrant/trusty/
 sudo dpkg -i klic_3.003-gm1-4.1_i386.deb  klic-doc_3.003-gm1-4.1_all.deb
 ```
 
@@ -32,7 +32,7 @@ vagrant up
 vagrant reload
 
 # crear los paquetes
-vagrant --provision --provision-with crea_paquete_deb
+vagrant provision --provision-with crea_paquete_deb
 
 ```
 
