@@ -83,4 +83,14 @@ wget --tries=inf --timestamping --recursive --level=inf --convert-links --page-r
 * https://github.com/GunterMueller/KLIC Después de hacer todo el trabajo, encontré este otro repo que al parecer ya lo tiene funcionando.  No lo miré, lo anoto para ver otro día. Mi fork en https://github.com/CesarBallardini/KLIC
 
 
+* https://ja.wikipedia.org/wiki/Guarded_Horn_Clauses (en japonés, usar Google translator al inglés)
+* https://www.ueda.info.waseda.ac.jp/~ueda/pub/GHCthesis.pdf GUARDED HORN CLAUSES / Kazunori Ueda / March 1986
+* https://core.ac.uk/download/pdf/82787481.pdf THE DEEVOLUTION OF CONCURRENT LOGIC PROGRAMMING LANGUAGES / E. TICK / 1995
+* https://www.ueda.info.waseda.ac.jp/~ueda/readings/GHC-intro.pdf presentación en japonés
+* https://www.ida.liu.se/~ulfni53/lpp/bok/bok.pdf LOGIC, PROGRAMMING AND PROLOG (2ED) / Ulf Nilsson and Jan Małuszyński (una intro suave al tema GHC)
+* http://blog.solutekcolombia.com/quinta-generacion-de-computadoras/ Reseña de eventos en el proyecto de 5ta generación.
+* https://www.wikiwand.com/es/Quinta_generaci%C3%B3n_de_computadoras otra reseña, interesante la lista de bibliografía
+* https://www.cs.unm.edu/~eschulte/classes/cs550/data/middle-hist-lp.pdf Middle History of Logic Programming / Resolution, Planner, Prolog, and the Japanese Fifth Generation Project / Carl Hewitt
+* https://www.cs.utexas.edu/users/EWD/transcriptions/EWD04xx/EWD472.html Guarded commands, non-determinacy and formal derivation of programs. / by Edsger W.Dijkstra https://www.cs.utexas.edu/users/EWD/ewd04xx/EWD472.PDF
+ 	
 
