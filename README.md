@@ -73,7 +73,7 @@ wget --tries=inf --timestamping --recursive --level=inf --convert-links --page-r
 
 
 * https://www.springer.com/gp/book/9783540666837 Agent-Oriented Programming, From Prolog to Guarded Definite Clauses / Authors: Huntbach, Matthew M., Ringwood, Graem A. / 1999 / un libro que te puede volar la cabeza
-
+  * [Agent-oriented programming](https://archive.org/details/springer_10.1007-3-540-47938-4)
 
 * KLIC Association, ahora extinta, sus páginas en Web Archive:
   * https://web.archive.org/web/20100117145812/http://www.klic.org/software/klic/index.en.html
