@@ -81,7 +81,7 @@ wget --tries=inf --timestamping --recursive --level=inf --convert-links --page-r
 
 
 * https://github.com/GunterMueller/KLIC Después de hacer todo el trabajo, encontré este otro repo que al parecer ya lo tiene funcionando.  No lo miré, lo anoto para ver otro día. Mi fork en https://github.com/CesarBallardini/KLIC
-
+ * https://archive.org/details/springer_10.1007-3-540-47938-4 Libro online listo para leer
 
 * https://ja.wikipedia.org/wiki/Guarded_Horn_Clauses (en japonés, usar Google translator al inglés)
 * https://www.ueda.info.waseda.ac.jp/~ueda/pub/GHCthesis.pdf GUARDED HORN CLAUSES / Kazunori Ueda / March 1986
