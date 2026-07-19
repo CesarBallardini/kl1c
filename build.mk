@@ -8,26 +8,28 @@ SKIP ?=
 SRCS := $(filter-out $(SKIP),$(wildcard *.kl1))
 EXES := $(SRCS:.kl1=)
 .PHONY: all test clean distclean
-.ONESHELL:
 
 all: $(EXES)
 
 %: %.kl1
 	$(KLIC) -o $@ $<
 
+# Written as one shell command (backslash-continued) so it does NOT depend on
+# .ONESHELL: -- Ubuntu Trusty ships GNU Make 3.81, which ignores .ONESHELL and
+# would run each line in its own shell, breaking the for-loop.
 test:
-	@rc=0
-	for s in $(SRCS); do
-	  n=$${s%.kl1}
-	  if $(KLIC) -o "$$n" "$$s" >/tmp/klic-test.log 2>&1; then
-	    got=$$(timeout 15 ./"$$n" </dev/null 2>&1); grc=$$?
-	    if [ -f "$$n.expected" ]; then
-	      if [ "$$got" = "$$(cat "$$n.expected")" ]; then echo "  PASS  $$n"; else echo "  FAIL  $$n  got=[$$got]  want=[$$(cat "$$n.expected")]"; rc=1; fi
-	    elif [ "$$grc" -eq 0 ]; then echo "  RUN   $$n  -> $$got"
-	    else echo "  CRASH $$n  (exit $$grc)"; rc=1; fi
-	  else echo "  CFAIL $$n"; rc=1; fi
-	  rm -f "$$n" *.c *.h *.o *.ext klic.db work* core 2>/dev/null
-	done
+	@rc=0; \
+	for s in $(SRCS); do \
+	  n=$${s%.kl1}; \
+	  if $(KLIC) -o "$$n" "$$s" >/tmp/klic-test.log 2>&1; then \
+	    got=$$(timeout 15 ./"$$n" </dev/null 2>&1); grc=$$?; \
+	    if [ -f "$$n.expected" ]; then \
+	      if [ "$$got" = "$$(cat "$$n.expected")" ]; then echo "  PASS  $$n"; else echo "  FAIL  $$n  got=[$$got]  want=[$$(cat "$$n.expected")]"; rc=1; fi; \
+	    elif [ "$$grc" -eq 0 ]; then echo "  RUN   $$n  -> $$got"; \
+	    else echo "  CRASH $$n  (exit $$grc)"; rc=1; fi; \
+	  else echo "  CFAIL $$n"; rc=1; fi; \
+	  rm -f "$$n" *.c *.h *.o *.ext klic.db work* core 2>/dev/null; \
+	done; \
 	exit $$rc
 
 clean distclean:

@@ -166,50 +166,67 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           sudo apt-get install debhelper dh-make expect xterm vim mc ${APT_OPTIONS}
 
 
-          mkdir deb/
+          # Start from a clean working area so re-runs are idempotent: a previous build leaves
+          # its own klic_*+kl1c1.{dsc,deb,changes,...} here, and a stray second .dsc would make
+          # `dpkg-source -x` misparse (it treats a 2nd arg as the output dir). The source cache
+          # lives under /vagrant/download-cache (below), NOT here, so this wipe is safe.
+          rm -rf deb/
+          mkdir -p deb/
           pushd deb/
-          
+
           export PACKAGE=klic
           export FULL_VERSION=3.003-gm1-4.1
           export SHORT_VERSION=3.003-gm1
           export SNAPSHOT_URL_BASE=https://snapshot.debian.org/archive/debian/20061106T000000Z/pool/main/k/klic/
 
-          wget ${SNAPSHOT_URL_BASE}/${PACKAGE}-doc_${FULL_VERSION}_all.deb
+          # Cache the downloaded Debian source on the host (persists across `vagrant destroy`,
+          # since /vagrant is the repo mount). Each file is fetched only if not already cached,
+          # downloaded to a .tmp first so an interrupted wget never leaves a corrupt cache entry.
+          # Only the three source files are cached; the build regenerates the doc .deb itself.
+          CACHE=/vagrant/download-cache
+          mkdir -p "$CACHE"
+          for f in ${PACKAGE}_${FULL_VERSION}.dsc \
+                   ${PACKAGE}_${FULL_VERSION}.diff.gz \
+                   ${PACKAGE}_${SHORT_VERSION}.orig.tar.gz; do
+            if [ ! -f "$CACHE/$f" ]; then
+              wget -O "$CACHE/$f.tmp" "${SNAPSHOT_URL_BASE}/$f" && mv "$CACHE/$f.tmp" "$CACHE/$f"
+            fi
+            cp "$CACHE/$f" .
+          done
 
-          wget ${SNAPSHOT_URL_BASE}/${PACKAGE}_${FULL_VERSION}.dsc
-          wget ${SNAPSHOT_URL_BASE}/${PACKAGE}_${FULL_VERSION}.diff.gz
-          wget ${SNAPSHOT_URL_BASE}/${PACKAGE}_${SHORT_VERSION}.orig.tar.gz
-
-          
-          dpkg-source -x *.dsc
+          dpkg-source -x ${PACKAGE}_${FULL_VERSION}.dsc   # explicit .dsc (not *.dsc) -> unambiguous
           pushd klic-3.003-gm1/
 
-          #add a comment to the changelog
-          #dch -i
-
-          # klic (3.003-gm1-4.1ubuntu1) UNRELEASED; urgency=medium
-          # 
-          #   * Ubuntu 16.04 Trusty Release
-          # 
-          #  -- Cesar Ballardini <cesar.ballardini@gmail.com>  Sun, 18 Oct 2020 17:46:31 +0000
-
           echo 5 > debian/compat
-          patch  -p0 < /vagrant/patch.rules 
+          patch  -p0 < /vagrant/patch.rules
           cp /vagrant/patch5.configure-bcmp debian/patch5.configure-bcmp
+          cp /vagrant/patch6.print-varargs debian/patch6.print-varargs   # patch.rules applies this too; fixes builtin:print of compound terms ([..] -> [1,2,3])
           patch -p0 < /vagrant/patch.configure.expect
+
+          # Bump the Debian revision so the patched packages are distinguishable from the pristine
+          # 3.003-gm1-4.1 (`dpkg -s klic` then shows the new version -- the easy way to confirm a
+          # rebuild took). `dch --local +kl1c` turns 3.003-gm1-4.1 into 3.003-gm1-4.1+kl1c1; the
+          # changelog entry also documents why these packages differ from Debian's.
+          export DEBEMAIL="cesar.ballardini@gmail.com"
+          export DEBFULLNAME="Cesar Ballardini"
+          dch --local +kl1c -D UNRELEASED "Rebuild for modern hosts: patch5 (force USEBCMP/USEBZERO/USESTRCHR), patch6 (real <stdarg.h> varargs, fixes builtin:print of compound terms), configure.expect tweaks, debian/compat set for the build host."
+
           debuild -us -uc -d
 
           popd
 
-          # install the freshly created packages:
-          sudo dpkg -i klic_3.003-gm1-4.1_i386.deb  klic-doc_3.003-gm1-4.1_all.deb
+          # install the freshly created packages (globs so this stays version-agnostic after the dch bump):
+          sudo dpkg -i klic_*_i386.deb klic-doc_*_all.deb
 
+          # Publish the freshly built packages into the repo's trusty/ dir (via the /vagrant mount).
+          # Older builds are kept (each version bump adds a new filename); trusty/install-latest.sh
+          # picks the highest version at install time, so the newest is always the one chosen.
+          cp klic_*_i386.deb klic-doc_*_all.deb /vagrant/trusty/
 
-
-          # verify the installation:
+          # verify the installation (the +kl1c1 revision confirms the patched rebuild is what got installed):
           dpkg -l | grep klic
-#          # ii  klic                                    3.003-gm1-4.1ubuntu1                       i386         KL1 to C compiler system
-#          # ii  klic-doc                                3.003-gm1-4.1ubuntu1                       all          Documentation and sample KL1 files for the KLIC
+#          # ii  klic                                    3.003-gm1-4.1+kl1c1                        i386         KL1 to C compiler system
+#          # ii  klic-doc                                3.003-gm1-4.1+kl1c1                        all          Documentation and sample KL1 files for the KLIC
 
         SHELL
     end

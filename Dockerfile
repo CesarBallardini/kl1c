@@ -51,10 +51,22 @@ RUN dpkg --add-architecture i386 \
 
 WORKDIR /build
 
-# Download the Debian source from the snapshot (same URLs as the Vagrantfile).
-RUN wget -q "${SNAPSHOT_URL_BASE}/${PACKAGE}_${FULL_VERSION}.dsc" \
- && wget -q "${SNAPSHOT_URL_BASE}/${PACKAGE}_${FULL_VERSION}.diff.gz" \
- && wget -q "${SNAPSHOT_URL_BASE}/${PACKAGE}_${SHORT_VERSION}.orig.tar.gz"
+# The Debian source is vendored in this repo under download-cache/ (fetched once from
+# ${SNAPSHOT_URL_BASE}). Bring the cache into the image, then use it: for each source file,
+# copy it from the cache if present, otherwise download it into the cache first and then copy.
+# So a populated cache means a fully offline, reproducible build (even if snapshot.debian.org
+# disappears), while an empty/partial cache self-heals by fetching only what is missing.
+COPY download-cache/ /build/cache/
+RUN set -e; mkdir -p /build/cache; \
+    for f in ${PACKAGE}_${SHORT_VERSION}.orig.tar.gz \
+             ${PACKAGE}_${FULL_VERSION}.diff.gz \
+             ${PACKAGE}_${FULL_VERSION}.dsc; do \
+      if [ ! -f "/build/cache/$f" ]; then \
+        echo "cache miss -> downloading $f"; \
+        wget -q -O "/build/cache/$f.tmp" "${SNAPSHOT_URL_BASE}/$f" && mv "/build/cache/$f.tmp" "/build/cache/$f"; \
+      else echo "cache hit  -> $f"; fi; \
+      cp "/build/cache/$f" /build/; \
+    done
 
 # The patches live in this repo; bring them into the build context.
 #   patch.rules            -> injects the patch5/patch6 apply lines into debian/rules
@@ -124,7 +136,13 @@ RUN printf '#!/bin/sh\nexec /usr/bin/gcc -m32 -fpermissive -fcommon -fgnu89-inli
 # installed programs"), so without this our `gcc` wrapper above is never seen -- the build
 # would run the real /usr/bin/gcc, get no -m32 (amd64 binaries) and no -fpermissive
 # (the 2006 K&R code fails with -Wimplicit-int errors under gcc >=14).
+# Bump the Debian revision (3.003-gm1-4.1 -> 3.003-gm1-4.1+kl1c1) so the patched packages are
+# distinguishable from the pristine Debian ones -- same scheme as the Vagrant provisioner, so both
+# build paths emit identically-versioned packages. The final-stage COPY/dpkg globs on klic_*.deb,
+# so the new filename needs no other change here.
 RUN cd klic-${SHORT_VERSION} \
+ && DEBEMAIL="cesar.ballardini@gmail.com" DEBFULLNAME="Cesar Ballardini" \
+    dch --local +kl1c -D UNRELEASED "Rebuild for modern hosts: patch5 (force USEBCMP/USEBZERO/USESTRCHR), patch6 (real <stdarg.h> varargs, fixes builtin:print of compound terms), configure.expect tweaks, debian/compat 5->7 for trixie." \
  && debuild --prepend-path=/usr/local/bin -us -uc -d
 
 # The .deb files end up in /build (the parent dir of the source tree).

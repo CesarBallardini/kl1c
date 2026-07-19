@@ -7,6 +7,25 @@ binaries were 32-bit.
 
 To recreate the package on a more modern distro, I used Ubuntu 16.04 Trusty i686.
 
+# Prerequisites
+
+The Vagrantfile requires the `vagrant-disksize` plugin (it sets the VM disk size). Install it once
+before bringing the VM up:
+
+```bash
+vagrant plugin install vagrant-disksize
+```
+
+Do **not** install `vagrant-vbguest`. The `ubuntu/trusty32` box already ships with Guest Additions,
+which are enough for the `/vagrant` synced folder. On a mismatch (box GA 4.3.40 vs a modern VirtualBox)
+Vagrant only prints a harmless warning and continues. The `vagrant-vbguest` plugin (0.32.0), on the
+other hand, crashes `vagrant up` on current Vagrant: it calls `File.exists?`, which Ruby 3.2+ removed,
+and Vagrant 2.4.9 embeds Ruby 3.3. If it is already installed, remove it:
+
+```bash
+vagrant plugin uninstall vagrant-vbguest
+```
+
 # How to use the ready-made packages
 
 The `trusty` directory holds the `.deb` packages built for Trusty.
@@ -21,7 +40,7 @@ vagrant reload
 vagrant ssh  #  log into the VM
 
 cd /vagrant/trusty/
-sudo dpkg -i klic_3.003-gm1-4.1_i386.deb  klic-doc_3.003-gm1-4.1_all.deb
+./install-latest.sh    # installs the newest klic + klic-doc .deb present (highest Debian version)
 ```
 
 # How to recreate the `.deb` packages
