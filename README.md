@@ -42,6 +42,79 @@ The packages end up in `/home/vagrant/deb/` (that is inside the VM).
 
 
 
+# Using the Docker container
+
+Instead of the Vagrant VM, you can build KLIC as a Docker image (Debian trixie, amd64 host; KLIC is
+compiled 32-bit via `gcc -m32`). This needs only Docker.
+
+## Build the image
+
+```bash
+docker build -t kl1c .
+```
+
+The build downloads the Debian `klic 3.003-gm1` source, applies this repo's patches, builds the
+`.deb`s and installs them, so `klic` is ready to use.
+
+## Run the container (mounting the repo)
+
+Mount the repo at `/work` so you can compile the `.kl1` files in place. The mount syntax depends on
+your shell:
+
+| Host shell          | Command                                                        |
+|---------------------|----------------------------------------------------------------|
+| Linux / macOS / WSL | `docker run --rm -it -v "$PWD":/work kl1c`                      |
+| Windows PowerShell  | `docker run --rm -it -v "${PWD}:/work" kl1c`                    |
+| Windows Git Bash    | `MSYS_NO_PATHCONV=1 docker run --rm -it -v "$PWD":/work kl1c`   |
+| Windows cmd.exe     | `docker run --rm -it -v "%cd%":/work kl1c`                      |
+
+On **Windows** (Git Bash) you must set `MSYS_NO_PATHCONV=1`, otherwise MSYS mangles the `:/work`
+target and the mount comes up empty. It is a harmless no-op on Linux/macOS/WSL, so every mount command
+below is prefixed with it and works on all platforms as written.
+
+## Build and test everything with `make`
+
+The repo has recursive `make` targets. The container's working directory is `/work` (the mount), so
+`make` runs there by default:
+
+```bash
+# build every KL1 program (distribution examples + book examples, all chapters)
+MSYS_NO_PATHCONV=1 docker run --rm -v "$PWD":/work kl1c make all
+
+# run every test and example: tests/ compares each program's output to its .expected,
+# the book examples are verified the same way, and the distribution examples are compiled
+MSYS_NO_PATHCONV=1 docker run --rm -v "$PWD":/work kl1c make test
+
+# remove all generated files
+MSYS_NO_PATHCONV=1 docker run --rm -v "$PWD":/work kl1c make clean
+```
+
+`make all`/`make test`/`make clean` recurse into `examples/`, `agent-oriented-programming/` (per
+chapter) and `tests/` (per category), running the same target in each. `make test` prints one line per
+program (`PASS` / `FAIL` / `RUN` / `CFAIL`) and exits non-zero if anything fails.
+
+You can also run a single subtree or category:
+
+```bash
+MSYS_NO_PATHCONV=1 docker run --rm -v "$PWD":/work kl1c make -C tests/float test
+MSYS_NO_PATHCONV=1 docker run --rm -v "$PWD":/work kl1c make -C agent-oriented-programming test
+```
+
+## Run a single example interactively
+
+```bash
+MSYS_NO_PATHCONV=1 docker run --rm -it -v "$PWD":/work kl1c
+# then, inside the container:
+make -C agent-oriented-programming/ch04-event-driven-condition-synchronization
+./agent-oriented-programming/ch04-event-driven-condition-synchronization/primes_sieve  # -> [2,3,5,7,11,13,17,19,23,29]
+
+cd examples && make fact && ./fact   # KLIC distribution example -> 39916800
+```
+
+See `tests/README.md`, `agent-oriented-programming/README.md` and `examples/README.md` for details.
+(`tests/` also ships a `run.sh` runner with category filters and a configurable per-case timeout.)
+
+
 # Appendix: Downloading klic sources
 
 * We download a mirror of ICOT's free software (ifs: ICOT Free Software) from its online DVD; from

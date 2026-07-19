@@ -1,4 +1,4 @@
-SUBDIRS := $(sort $(dir $(wildcard ch*/Makefile)))
+SUBDIRS := $(sort $(dir $(wildcard */Makefile)))
 .PHONY: all test clean distclean
 .ONESHELL:
 all test clean distclean:
