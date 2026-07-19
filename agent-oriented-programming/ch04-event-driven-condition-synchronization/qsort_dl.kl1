@@ -1,0 +1,42 @@
+/*
+ * Difference-list quicksort.
+ *
+ * Source: Huntbach & Ringwood, "Agent-Oriented Programming: From Prolog to
+ *   Guarded Definite Clauses", Ch. 4 "Event Driven Condition Synchronization"
+ *   (printed pp. 121-122; PDF pp. 241-242).
+ *
+ * Original book listing (GDC), transcribed verbatim:
+ *     //quicksort(UnsortedList, SortedList)
+ *     qsort(Unsorted,Sorted) :- qsort(Unsorted,Sorted,[]).
+ *     qsort([],Sorted,Tail) :- true | Sorted=Tail.
+ *     qsort([Pivot|List],Sorted,Tail):-
+ *        | part(List,Pivot,Lesser,Greater),
+ *            qsort(Lesser,LSorted,[Pivot|GSorted]),
+ *            qsort(Greater,GSorted,Tail).
+ *
+ * Adaptations to compile and run in klic:
+ *   - 'LSorted' is a typo in the text: it should be 'Sorted' (otherwise the head
+ *     'Sorted' never gets bound and the result stays uninstantiated).
+ *   - the book does not repeat 'part' here; the qsort definition from Ch. 3 is used.
+ *   - output via 'klicio' + 'putt' (the KLIC distribution harness; 'builtin:print'
+ *     used to crash on compound terms in this build, now fixed by patch6).
+ */
+
+:- module main.
+
+main :- klicio:klicio([stdout(Res)]), check_stream(Res).
+
+check_stream(normal(St)) :- qsort([3,5,2,1,4,2,7,8,6,9], X), St = [putt(X), nl].
+check_stream(abnormal).
+
+qsort(Unsorted, Sorted) :- qsort(Unsorted, Sorted, []).
+
+qsort([], Sorted, Tail) :- Sorted = Tail.
+qsort([Pivot|List], Sorted, Tail) :-
+    part(List, Pivot, Lesser, Greater),
+    qsort(Lesser,  Sorted,  [Pivot|GSorted]),
+    qsort(Greater, GSorted, Tail).
+
+part([], P, S, G)    :- S=[], G=[].
+part([H|T], P, S, G) :- H =< P | part(T, P, S1, G), S=[H|S1].
+part([H|T], P, S, G) :- H  > P | part(T, P, S, G1), G=[H|G1].

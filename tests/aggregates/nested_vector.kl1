@@ -1,0 +1,6 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+/* Nested vectors: accessing elements of a {..} inside another {..}.  Ref: KLIC.info "Vectors". */
+o(normal(St)) :- v(Inner, E), St=[putt([{{1,2},{3,4}}, Inner, E]), nl].
+v(Inner, E) :- true | generic:element({{1,2},{3,4}}, 1, Inner), generic:element(Inner, 0, E).

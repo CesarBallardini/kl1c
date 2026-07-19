@@ -1,0 +1,15 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+/* String creation/splitting/search: new_string, element_size, generic:set_element,
+ * generic:split/join, search_character, string_less_than.  Ref: KLIC.info "Strings". */
+o(normal(St)) :- s(New, ES, Set, Lo, Hi, J, Pos, Cmp), St=[putt([New,ES,Set,Lo,Hi,J,Pos,Cmp]), nl].
+s(New,ES,Set,Lo,Hi,J,Pos,Cmp) :- true |
+    new_string(New, [104,105,33], 8),
+    generic:element_size("abc", ES),
+    generic:set_element("abcd", 1, 90, Set),
+    generic:split("abcdef", 3, Lo, Hi), generic:join(Lo, Hi, J),
+    generic:search_character("hello", 0, 4, 108, Pos),
+    cmp("abc", "abd", Cmp).
+cmp(A,B,R) :- string_less_than(A,B) | R=less.
+cmp(A,B,R) :- true                  | R=notless.

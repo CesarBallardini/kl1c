@@ -1,0 +1,4 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+o(normal(St)) :- true | generic:new(random_numbers, RNG, 42), St=[putt(created), nl].

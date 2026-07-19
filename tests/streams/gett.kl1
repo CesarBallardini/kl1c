@@ -1,0 +1,6 @@
+:- module main.
+main :- klicio:klicio([stdout(OutRes), write_open("/tmp/kio.dat", WRes)]), go(OutRes, WRes).
+go(normal(Out), normal(WS)) :- WS = [putt(foo(1,2)), putc(46), nl, fclose(WAck)], rb(WAck, Out).
+rb(WAck, Out) :- wait(WAck) | klicio:klicio([read_open("/tmp/kio.dat", RRes)]), dr(RRes, Out).
+dr(normal(RS), Out) :- RS = [gett(T), fclose(RAck)], done(RAck, Out, got(T)).
+done(RAck, Out, V) :- wait(RAck) | Out = [putt(V), nl].

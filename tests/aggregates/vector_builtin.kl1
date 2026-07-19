@@ -1,0 +1,5 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+o(normal(St)) :- vlen({a,b,c}, L), set_vector_element({a,b,c}, 1, z, V2), St=[putt([L,V2]), nl].
+vlen(V,L) :- vector(V,Lx) | L=Lx.

@@ -1,14 +1,14 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-# Para aprovechar este Vagrantfile necesita Vagrant y Virtualbox instalados:
+# To use this Vagrantfile you need Vagrant and Virtualbox installed:
 #
 #   * Virtualbox
 #
 #   * Vagrant
 #
-#   * Plugins de Vagrant:
-#       + vagrant-proxyconf y su configuracion si requiere de un Proxy para salir a Internet
+#   * Vagrant plugins:
+#       + vagrant-proxyconf and its configuration if you need a Proxy to reach the Internet
 #       + vagrant-cachier
 #       + vagrant-disksize
 #       + vagrant-hostmanager
@@ -23,12 +23,12 @@ HOSTNAME = "kl1c"
 $post_up_message = <<POST_UP_MESSAGE
 ------------------------------------------------------
 KL1 - Kernel Language 1
-Proyecto de Quinta Generación japonés
+Japanese Fifth Generation project
 
-Ubuntu 16.04 Trusty i686 (32 bits)
+Ubuntu 16.04 Trusty i686 (32-bit)
 
-Ver directorio /vagrant/examples/ para compilar y correr
-los ejemplos que trae la distribución
+See the /vagrant/examples/ directory to compile and run
+the examples that ship with the distribution
 
 ------------------------------------------------------
 POST_UP_MESSAGE
@@ -45,7 +45,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.hostmanager.ignore_private_ip = false
     config.hostmanager.include_offline = true
 
-    # uso cachier con NFS solamente si el hostmanager gestiona los nombres en /etc/hosts del host
+    # use cachier with NFS only if hostmanager manages the names in the host's /etc/hosts
     if Vagrant.has_plugin?("vagrant-cachier")
 
       config.cache.auto_detect = false
@@ -62,7 +62,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       # NFS for shared folders. This is also very useful for vagrant-libvirt if you
       # want bi-directional sync
 
-      # NOTA: con encrypted HOME, no funciona el NFS, si no es tu caso, descomenta los parametros siguientes:
+      # NOTE: with an encrypted HOME, NFS does not work; if that's not your case, uncomment the following parameters:
       #config.cache.synced_folder_opts = {
       #  type: :nfs,
       #  # The nolock option can be useful for an NFSv3 client that wants to avoid the
@@ -93,7 +93,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     srv.vm.hostname = HOSTNAME
 
     if Vagrant.has_plugin?("vagrant-hostmanager")
-      srv.hostmanager.aliases = %W(#{HOSTNAME+".dominio.local.tld'"} #{HOSTNAME} )
+      srv.hostmanager.aliases = %W(#{HOSTNAME+".domain.local.tld'"} #{HOSTNAME} )
     end
 
     if Vagrant.has_plugin?("vagrant-vbguest") then
@@ -111,18 +111,18 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
 
 
-      # https://www.virtualbox.org/manual/ch08.html#vboxmanage-modifyvm mas parametros para personalizar en VB
+      # https://www.virtualbox.org/manual/ch08.html#vboxmanage-modifyvm more parameters to customize in VB
     end
   end
 
     ##
-    # Aprovisionamiento
+    # Provisioning
     #
     config.vm.provision "fix-no-tty", type: "shell" do |s|
         s.privileged = false
         s.inline = "sudo sed -i '/tty/!s/mesg n/tty -s \\&\\& mesg n/' /root/.profile"
     end
-    config.vm.provision "actualiza", type: "shell" do |s|  # http://foo-o-rama.com/vagrant--stdin-is-not-a-tty--fix.html
+    config.vm.provision "system_update", type: "shell" do |s|  # http://foo-o-rama.com/vagrant--stdin-is-not-a-tty--fix.html
         s.privileged = false
         s.inline = <<-SHELL
           export DEBIAN_FRONTEND=noninteractive
@@ -151,11 +151,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
             echo #{ssh_pub_key} >> /root/.ssh/authorized_keys
           SHELL
       rescue
-          puts "No hay claves publicas en el HOME de su pc"
-          s.inline = "echo OK sin claves publicas"
+          puts "No public keys in your PC's HOME"
+          s.inline = "echo OK without public keys"
       end
     end
-    config.vm.provision "crea_paquete_deb", type: "shell", run: "never" do |s|  # http://foo-o-rama.com/vagrant--stdin-is-not-a-tty--fix.html
+    config.vm.provision "build_deb_packages", type: "shell", run: "never" do |s|  # http://foo-o-rama.com/vagrant--stdin-is-not-a-tty--fix.html
         s.privileged = false
         s.inline = <<-SHELL
           export DEBIAN_FRONTEND=noninteractive
@@ -169,22 +169,22 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           mkdir deb/
           pushd deb/
           
-          export PAQUETE=klic
-          export VERSION_LARGA=3.003-gm1-4.1
-          export VERSION_CORTA=3.003-gm1
+          export PACKAGE=klic
+          export FULL_VERSION=3.003-gm1-4.1
+          export SHORT_VERSION=3.003-gm1
           export SNAPSHOT_URL_BASE=https://snapshot.debian.org/archive/debian/20061106T000000Z/pool/main/k/klic/
 
-          wget ${SNAPSHOT_URL_BASE}/${PAQUETE}-doc_${VERSION_LARGA}_all.deb
+          wget ${SNAPSHOT_URL_BASE}/${PACKAGE}-doc_${FULL_VERSION}_all.deb
 
-          wget ${SNAPSHOT_URL_BASE}/${PAQUETE}_${VERSION_LARGA}.dsc
-          wget ${SNAPSHOT_URL_BASE}/${PAQUETE}_${VERSION_LARGA}.diff.gz
-          wget ${SNAPSHOT_URL_BASE}/${PAQUETE}_${VERSION_CORTA}.orig.tar.gz
+          wget ${SNAPSHOT_URL_BASE}/${PACKAGE}_${FULL_VERSION}.dsc
+          wget ${SNAPSHOT_URL_BASE}/${PACKAGE}_${FULL_VERSION}.diff.gz
+          wget ${SNAPSHOT_URL_BASE}/${PACKAGE}_${SHORT_VERSION}.orig.tar.gz
 
           
           dpkg-source -x *.dsc
           pushd klic-3.003-gm1/
 
-          #agrego comentario al changelog
+          #add a comment to the changelog
           #dch -i
 
           # klic (3.003-gm1-4.1ubuntu1) UNRELEASED; urgency=medium
@@ -201,12 +201,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
           popd
 
-          # instala paquetes recién creados:
+          # install the freshly created packages:
           sudo dpkg -i klic_3.003-gm1-4.1_i386.deb  klic-doc_3.003-gm1-4.1_all.deb
 
 
 
-          # verifica la instalación:
+          # verify the installation:
           dpkg -l | grep klic
 #          # ii  klic                                    3.003-gm1-4.1ubuntu1                       i386         KL1 to C compiler system
 #          # ii  klic-doc                                3.003-gm1-4.1ubuntu1                       all          Documentation and sample KL1 files for the KLIC

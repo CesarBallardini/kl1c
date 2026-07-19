@@ -1,0 +1,8 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+/* Integer comparison with negatives and the equality boundary.  Ref: KLIC.info "Integer Comp". */
+o(normal(St)) :- c(-5,-3,R1), c(-3,-3,R2), c(0,-1,R3), St=[putt([R1,R2,R3]), nl].
+c(X,Y,R) :- X  < Y | R=lt.
+c(X,Y,R) :- X =:= Y | R=eq.
+c(X,Y,R) :- X  > Y | R=gt.

@@ -1,0 +1,6 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+o(normal(St)) :- cs(foo(1,2),foo(1,2),R1), cs([1,2,3],[1,2,3],R2), cs(a,a,R3), St=[putt([R1,R2,R3]), nl].
+cs(X,Y,R) :- compare(X,Y,C), C =:= 0 | R=equal.
+cs(X,Y,R) :- true | R=notequal.

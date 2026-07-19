@@ -1,0 +1,46 @@
+/*
+ * Bank account as an object (transaction server) in GDC.
+ *
+ * Source: Huntbach & Ringwood, "Agent-Oriented Programming: From Prolog to
+ *   Guarded Definite Clauses", Ch. 4 "Event Driven Condition Synchronization",
+ *   section 4.8 "The Client-Server Paradigm" (printed p. 122; PDF p. 242).
+ *
+ * An "accumulator" serves a stream of messages (deposit/debit/balance) carrying
+ * the balance as its second argument. It illustrates objects/abstract data types
+ * in GDC: each clause answers a class of message; the client hands over a
+ * variable as a "stamped envelope" and the server instantiates it with the reply.
+ *
+ * Book listing (verbatim; contains a typo: 'Total])' with an extra ']'):
+ *     accumulator([deposit(Amount)|More],Total) :- NewTotal:=Total+Amount
+ *          | accumulator(More,NewTotal).
+ *     accumulator([debit(Amount)|More],Total])
+ *          :- NewTotal:=Total-Amount, NewTotal>=0
+ *          | accumulator(More,NewTotal).
+ *     accumulator([balance(Amount)|More],Total)
+ *          :- Amount=total(Total), accumulator(More,Total).
+ *
+ * Adaptations for klic:
+ *   - the typo 'Total])' -> 'Total)' is fixed.
+ *   - a termination clause 'accumulator([], _)' is added (the book does not show
+ *     it; without it the empty list unifies with no clause).
+ *   - the 3rd clause binds the reply 'Amount' in the BODY (not in the guard: a
+ *     guard cannot instantiate the caller's variables).
+ *   - output via 'klicio' + 'putt' (see the other examples).
+ */
+
+:- module main.
+
+main :- klicio:klicio([stdout(S)]), out(S).
+
+out(normal(St)) :-
+    accumulator([deposit(100), deposit(50), debit(30), balance(B)], 0),
+    St = [putt(B), nl].
+out(abnormal).
+
+accumulator([], _) :- true | true.
+accumulator([deposit(Amount)|More], Total) :- NewTotal := Total + Amount |
+    accumulator(More, NewTotal).
+accumulator([debit(Amount)|More], Total) :- NewTotal := Total - Amount, NewTotal >= 0 |
+    accumulator(More, NewTotal).
+accumulator([balance(Amount)|More], Total) :-
+    Amount = total(Total), accumulator(More, Total).

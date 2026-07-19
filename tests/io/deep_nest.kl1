@@ -1,0 +1,4 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+o(normal(St)) :- St=[putt(f(g(h(i(j(k)))))), nl, putt([1,[2,[3,[4,[5]]]]]), nl].

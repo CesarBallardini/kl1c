@@ -1,0 +1,6 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+o(normal(St)) :- set_string_element("abcd", 1, 90, S2), lt("abc","abd",R), nlt("abd","abc",R2), St=[putt([S2,R,R2]), nl].
+lt(A,B,R) :- string_less_than(A,B) | R=less.
+nlt(A,B,R) :- string_not_less_than(A,B) | R=notless.

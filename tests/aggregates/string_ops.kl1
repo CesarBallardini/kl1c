@@ -1,0 +1,6 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+/* Strings: ".." notation, string_element/3, generic:string (length).  Ref: KLIC.info "Strings". */
+o(normal(St)) :- str("abcd", E, L), St=[putt([E,L]), nl].
+str(Str,E,L) :- true | string_element(Str,1,E), generic:string(Str,L,ES).

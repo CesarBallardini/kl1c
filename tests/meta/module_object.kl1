@@ -1,0 +1,5 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+/* Module object: generic:new(module,M,Name) and generic:name.  Ref: KLIC.info "Module Type". */
+o(normal(St)) :- true | generic:new(module, M, main), generic:name(M, N), St=[putt(N), nl].

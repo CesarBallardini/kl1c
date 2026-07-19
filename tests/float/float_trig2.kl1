@@ -1,0 +1,4 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+o(normal(St)) :- generic:tan(0.0,A), generic:asin(0.0,B), generic:acos(1.0,C), generic:atan(0.0,D), generic:sinh(0.0,E), generic:tanh(0.0,F), St=[putt([A,B,C,D,E,F]), nl].

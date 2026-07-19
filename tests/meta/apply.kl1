@@ -1,0 +1,8 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+/* generic:apply(PredObj, ArgVec): invokes the predicate with an argument vector.
+ * Ref: KLIC.info "Predicate Type". */
+o(normal(St)) :- P = predicate#(main:helper/1), generic:apply(P, {Res}), coll(Res, St).
+coll(R, St) :- St=[putt(R), nl].
+helper(X) :- true | X = applied_ok.

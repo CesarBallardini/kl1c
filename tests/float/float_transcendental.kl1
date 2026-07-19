@@ -1,0 +1,7 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+/* Float transcendental functions: pow sin cos exp log floor ceil.  Ref: KLIC.info "Floating Arith". */
+o(normal(St)) :- generic:pow(2.0,10.0,A), generic:sin(0.0,B), generic:cos(0.0,C),
+    generic:exp(0.0,D), generic:log(1.0,E), generic:floor(3.7,F), generic:ceil(3.2,G),
+    St=[putt([A,B,C,D,E,F,G]), nl].

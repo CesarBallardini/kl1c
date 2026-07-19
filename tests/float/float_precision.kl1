@@ -1,0 +1,6 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+/* Float division/multiplication precision (printed via putt).  Ref: KLIC.info "Floating Arith". */
+o(normal(St)) :- generic:divide(1.0,4.0,A), generic:divide(3.0,2.0,B), generic:multiply(0.1,0.1,C),
+    St=[putt([A,B,C]), nl].

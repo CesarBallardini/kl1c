@@ -1,0 +1,6 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+/* new_functor/3: creates a functor with a given name and arity (args initialized to 0).
+ * Ref: KLIC.info "Functor Operation". */
+o(normal(St)) :- new_functor(F, myatom, 2), St=[putt(F), nl].

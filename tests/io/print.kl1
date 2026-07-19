@@ -1,0 +1,4 @@
+/* builtin:print/1 with a compound term (list). It used to crash with gcc>=14 -O2;
+ * fixed by debian/patch6.print-varargs (real varargs in klic_fprintf). */
+:- module main.
+main :- builtin:print([1,2,3]).

@@ -1,0 +1,6 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+/* putt with a mixed, nested structure: integer, functor with list, vector, string,
+ * float and negative, all in one list.  Ref: KLIC.info "Prolog I/O". */
+o(normal(St)) :- St=[putt([1, foo(a,[b,c]), {x,y}, "s", 1.5, -2]), nl].

@@ -1,0 +1,6 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+/* bitwise :=: /\ \/ xor << >>.  Ref: KLIC.info "Integer Arith". */
+o(normal(St)) :- A:=12 /\ 10, B:=12 \/ 10, C:=12 xor 10, D:=1 << 4, E:=64 >> 2,
+    St=[putt([A,B,C,D,E]), nl].

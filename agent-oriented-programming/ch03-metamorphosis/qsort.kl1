@@ -1,0 +1,36 @@
+/*
+ * Naive quicksort with concatenation.
+ *
+ * Source: Huntbach & Ringwood, "Agent-Oriented Programming: From Prolog to
+ *   Guarded Definite Clauses", Ch. 3 "Metamorphosis", section 3.10 "Guarded
+ *   Definite Clauses" (printed pp. 88-91; PDF pp. 277-280).
+ *
+ * The book writes guards with the instance operator << (e.g.
+ * 'qsort(Unsorted,Sorted) :- []<<Unsorted | Sorted=[].'), which matches the
+ * pattern in the GUARD. klic (KL1) has no <<: the matching goes in the HEAD.
+ * This is the direct translation to KL1 (patterns in the head), with output via
+ * 'klicio' + 'putt' (the method used by the KLIC distribution examples). The
+ * book's concatenation ('conc') is Prolog's 'append'.
+ *
+ * Also, one typo from the earlier transcription is fixed: the pivot P must be
+ * reinserted between the two sorted sublists -> 'append(SS,[P|GG],B)'.
+ */
+
+:- module main.
+
+main :- klicio:klicio([stdout(Res)]), check_stream(Res).
+
+check_stream(normal(St)) :- qsort([3,5,2,1,4,2,7,8,6,9], X), St = [putt(X), nl].
+check_stream(abnormal).
+
+qsort([], B) :- B = [].
+qsort([P|L], B) :-
+    part(L, P, S, G), append(SS, [P|GG], B),
+    qsort(S, SS), qsort(G, GG).
+
+part([], P, S, G)    :- S=[], G=[].
+part([H|T], P, S, G) :- H =< P | part(T, P, S1, G), S=[H|S1].
+part([H|T], P, S, G) :- H  > P | part(T, P, S, G1), G=[H|G1].
+
+append([], Y, Z)    :- Z = Y.
+append([H|T], Y, Z) :- append(T, Y, W), Z = [H|W].

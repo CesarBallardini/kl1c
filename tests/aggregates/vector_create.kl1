@@ -1,0 +1,9 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+/* Vector creation/splitting: new_vector (from a list), vector_element (builtin),
+ * generic:split/join.  Ref: KLIC.info "Vectors". */
+o(normal(St)) :- v(E, Lo, Hi, J), St=[putt([E,Lo,Hi,J]), nl].
+v(E,Lo,Hi,J) :- true |
+    new_vector(V, [a,b,c,d]), vector_element(V, 2, E),
+    generic:split(V, 2, Lo, Hi), generic:join(Lo, Hi, J).

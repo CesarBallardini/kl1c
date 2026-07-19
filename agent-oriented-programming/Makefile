@@ -1,20 +1,9 @@
-# Makefile
-#
-KLIC=klic
+# Recursive builder: delegates to each chapter's Makefile (ch*/).
+#   make            build all examples of all chapters
+#   make -C ch03-metamorphosis qsort   build a single one
+CHAPTERS := $(sort $(dir $(wildcard ch*/Makefile)))
 
-SOURCES=not.kl1 qsort.kl1
+all clean distclean:
+	@for d in $(CHAPTERS); do echo "== $$d =="; $(MAKE) -C $$d $@ || exit $$?; done
 
-EXES = $(SOURCES:%.kl1=%)
-
-
-%: %.kl1
-        $(KLIC) -o $@ $<
-
-clean:
-	rm -f *.c *.ext *.h *.o work* *~ core klic.db
-
-distclean: clean
-        rm -f $(EXES)
-
-realclean: distclean
-
+.PHONY: all clean distclean

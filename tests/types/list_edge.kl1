@@ -1,0 +1,7 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+/* list/1 recognizes cons cells (non-empty lists). Note: list([]) is FALSE in klic
+ * (`[]` is the special nil atom). Ref: KLIC.info type sections. */
+o(normal(St)) :- l([1,2],R1), l([x],R2), St=[putt([R1,R2]), nl].
+l(X,R) :- list(X) | R=is_list.

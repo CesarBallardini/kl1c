@@ -1,0 +1,5 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+/* setarg/4: replaces one argument of a functor.  Ref: KLIC.info "Functor Operation". */
+o(normal(St)) :- setarg(2, foo(a,b,c), z, NewF), St=[putt(NewF), nl].

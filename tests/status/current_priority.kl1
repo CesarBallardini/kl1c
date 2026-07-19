@@ -1,0 +1,5 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+o(normal(St)) :- cp(R), St=[putt(R), nl].
+cp(R) :- current_priority(P), integer(P) | R=has_priority.

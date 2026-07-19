@@ -1,0 +1,8 @@
+/* read_open opens a file for reading; returns normal(Stream). Self-contained:
+ * writes a byte to /tmp and reads it back.  Ref: KLIC.info "Opening Prolog I/O". */
+:- module main.
+main :- klicio:klicio([stdout(OutRes), write_open("/tmp/kread.dat", WRes)]), go(OutRes, WRes).
+go(normal(Out), normal(WS)) :- WS=[putc(90), fclose(WAck)], rd(WAck, Out).
+rd(WAck, Out) :- wait(WAck) | klicio:klicio([read_open("/tmp/kread.dat", RRes)]), dr(RRes, Out).
+dr(normal(RS), Out) :- RS=[getc(C), fclose(RAck)], done(RAck, C, Out).
+done(RAck, C, Out) :- wait(RAck) | Out=[putt(read(C)), nl].

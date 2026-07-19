@@ -1,0 +1,4 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+o(normal(St)) :- true | klicio:klicio([write_open("/tmp/klic_wo.txt", normal(FS))]), FS=[putt(data), nl], St=[putt(opened), nl].

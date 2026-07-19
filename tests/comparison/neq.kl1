@@ -1,0 +1,7 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+/* \=/2 (not unifiable) and =/2.  Ref: KLIC.info "Comparison and Hashing"/"Unification". */
+o(normal(St)) :- n(a,b,R1), n(a,a,R2), St=[putt([R1,R2]), nl].
+n(X,Y,R) :- X \= Y | R=neq.
+n(X,Y,R) :- X  = Y | R=unifiable.

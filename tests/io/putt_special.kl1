@@ -1,0 +1,4 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+o(normal(St)) :- St=[putt('has space'), nl, putt([]), nl, putt(-42), nl, putt([1,[2,[3]],foo(bar)]), nl].

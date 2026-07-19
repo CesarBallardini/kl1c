@@ -1,0 +1,4 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+o(normal(St)) :- functor(foo,F1,N1), functor(42,F2,N2), functor([a|b],F3,N3), St=[putt([f(F1,N1),f(F2,N2),f(F3,N3)]), nl].

@@ -1,0 +1,202 @@
+Fix: builtin:print / klic_fprintf crash on compound terms with gcc>=14 -O2.
+The pre-<stdarg.h> fake-varargs (12 fixed 'long' params, callers passing
+fewer with only a K&R prototype) is miscompiled at -O2: a recursive
+fprint_partially() call gets its FILE* argument clobbered, so fprintf()
+aborts ('invalid stdio handle') / segfaults on lists and functors.
+Reimplemented with real varargs + proper variadic prototypes.
+
+--- a/include/klic/basic.h
++++ b/include/klic/basic.h
+@@ -6,6 +6,9 @@
+ ----------------------------------------------------------- */
+ 
+ #include <klic/config.h>
++/* KLIC-on-modern-gcc port: needed for the FILE* in the variadic prototypes of
++   klic_fprintf/debug_fprintf below (see debian/patch6.print-varargs). */
++#include <stdio.h>
+ 
+ #ifdef MAIN
+ #define Extern
+@@ -38,7 +41,7 @@
+ extern NoReturn voidfn fatal;
+ extern NoReturn voidfn fatalf;
+ extern NoReturn voidfn fatalp;
+-extern void debug_printf();
++extern void debug_printf(char *, ...);
+ 
+ /*
+   PARALLEL flag is DIST || SHM.
+@@ -62,8 +65,9 @@
+ extern int klic_fwrite();
+ extern int klic_fflush();
+ 
+-extern void debug_fprintf();
++extern void debug_fprintf(FILE *, char *, ...);
+ 
+-extern void klic_fprintf();
++extern void klic_fprintf(FILE *, char *, ...);
++extern void klic_printf(char *, ...);
+ 
+ #define klic_local_fprintf fprintf
+--- a/runtime/debug.c
++++ b/runtime/debug.c
+@@ -248,13 +248,26 @@
+ #endif
+ #endif
+ 
+-static Inline void 
+-klic_inner_fprintf(redirect, out, format,
+-		   a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, aa, ab)
++/*
++ * NOTE (KLIC-on-modern-gcc port): the original klic_fprintf/klic_printf/
++ * debug_fprintf/debug_printf were a pre-<stdarg.h> "fake varargs" hack -- each
++ * declared 12 fixed `long' parameters (a0..ab) and callers passed FEWER, with
++ * only a K&R prototype (`void klic_fprintf();') in scope.  gcc >= 14 at -O2
++ * miscompiles the callers around such mismatched calls: the arguments of a
++ * recursive fprint_partially() call get clobbered (its FILE* `stream' comes out
++ * a stack address), so fprintf() is handed a bogus FILE* and aborts with
++ * "invalid stdio handle" / SIGSEGV whenever a COMPOUND term is printed.
++ * The functions below are re-implemented with real <stdarg.h> varargs, which is
++ * both correct and immune to the miscompilation.  See debian/patch6.print-varargs.
++ */
++#include <stdarg.h>
++
++static void
++klic_inner_vfprintf(redirect, out, format, ap)
+      int redirect; /* if redirect != 0 -> redirect stdout/err */
+      FILE *out;
+      char *format;
+-     long a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, aa, ab;
++     va_list ap;
+ {
+   char *f;
+ #ifdef DIST
+@@ -263,18 +276,12 @@
+   declare_globals;
+ #endif
+ 
+-#ifdef __STDC__ 
++#ifdef __STDC__
+   void (*fprintf_func)(FILE *out, char *format, ...);
+ #else
+   void (*fprintf_func)();
+ #endif
+ 
+-  long args[12], *argp;
+-  args[0] = a0; args[1] = a1; args[2] = a2; args[3] = a3;
+-  args[4] = a4; args[5] = a5; args[6] = a6; args[7] = a7;
+-  args[8] = a8; args[9] = a9; args[10] = aa; args[11] = ab;
+-  argp = &args[0];
+-
+ #ifdef DIST
+   if(redirect) {
+     fprintf_func = iofprintf;
+@@ -298,22 +305,25 @@
+       switch (*f) {
+       case 'k':
+ #ifdef DEBUGLIB
+-	fprint_partially(out, (q)*argp, 3, 10);
++	fprint_partially(out, (q)va_arg(ap, long), 3, 10);
+ #else
+ 	fprintf_func(out, "???");
++	(void)va_arg(ap, long);
+ #endif
+-	argp++;
+ 	break;
+       case 'F':
++	{
++	  long fn = va_arg(ap, long);
+ #ifdef DEBUGLIB
+-	(*fprintf_func)(out, "%s/%d",
+-			atomname[functors[*argp-FUNCTORNUMBERBASE]-
+-			      ATOMNUMBERBASE],
+-			arities[*argp++ -FUNCTORNUMBERBASE]);
++	  (*fprintf_func)(out, "%s/%d",
++			  atomname[functors[fn-FUNCTORNUMBERBASE]-
++				ATOMNUMBERBASE],
++			  arities[fn-FUNCTORNUMBERBASE]);
+ #else
+-	(*fprintf_func)(out, "???/%d",
+-			arities[*argp++ -FUNCTORNUMBERBASE]);
++	  (*fprintf_func)(out, "???/%d",
++			  arities[fn-FUNCTORNUMBERBASE]);
+ #endif
++	}
+ 	break;
+       default:
+ 	{
+@@ -329,7 +339,7 @@
+ 	  }
+ 	  fmtbuf[k++] = *f;
+ 	  fmtbuf[k] = 0;
+-	  (*fprintf_func)(out, fmtbuf, *argp++);
++	  (*fprintf_func)(out, fmtbuf, va_arg(ap, long));
+ 	}
+       }
+     } else {
+@@ -346,43 +356,39 @@
+ }
+ 
+ void
+-klic_fprintf(out, format,
+-		  a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, aa, ab)
+-     FILE *out;
+-     char *format;
+-     long a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, aa, ab;
++klic_fprintf(FILE *out, char *format, ...)
+ {
+-  klic_inner_fprintf(1, out, format,
+-		     a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, aa, ab);
++  va_list ap;
++  va_start(ap, format);
++  klic_inner_vfprintf(1, out, format, ap);
++  va_end(ap);
+ }
+ 
+-klic_printf(format,
+-	    a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, aa, ab)
+-     char *format;
+-     long a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, aa, ab;
++void
++klic_printf(char *format, ...)
+ {
+-  klic_inner_fprintf(1, stdout, format,
+-		     a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, aa, ab);
++  va_list ap;
++  va_start(ap, format);
++  klic_inner_vfprintf(1, stdout, format, ap);
++  va_end(ap);
+ }
+ 
+ void
+-debug_fprintf(out, format,
+-		  a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, aa, ab)
+-     FILE *out;
+-     char *format;
+-     long a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, aa, ab;
++debug_fprintf(FILE *out, char *format, ...)
+ {
+-  klic_inner_fprintf(0, out, format,
+-		     a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, aa, ab);
++  va_list ap;
++  va_start(ap, format);
++  klic_inner_vfprintf(0, out, format, ap);
++  va_end(ap);
+ }
+ 
+ 
+-void debug_printf(format,
+-		  a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, aa, ab)
+-     char *format;
+-     long a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, aa, ab;
++void
++debug_printf(char *format, ...)
+ {
+-  debug_fprintf(stderr, format,
+-		a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, aa, ab);
++  va_list ap;
++  va_start(ap, format);
++  klic_inner_vfprintf(0, stderr, format, ap);
++  va_end(ap);
+ }
+ 

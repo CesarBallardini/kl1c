@@ -1,0 +1,5 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+/* atom_table:get_atom_string converts atom -> string.  Ref: KLIC.info "Symbolic Atoms". */
+o(normal(St)) :- atom_table:get_atom_string(hello, Str), St=[putt(Str), nl].

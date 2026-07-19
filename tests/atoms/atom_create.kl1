@@ -1,0 +1,8 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+/* Atom creation/query: make_atom (round-trip via get_atom_string) and get_atom_name.
+ * Ref: KLIC.info "Symbolic Atoms".  (atom_number returns an integer defined by the
+ * implementation -> not portable -> its value is not asserted.) */
+o(normal(St)) :- atom_table:make_atom("dynatom", A), atom_table:get_atom_string(A, Rt),
+    atom_table:get_atom_name(foo, Name), St=[putt([Rt, Name]), nl].

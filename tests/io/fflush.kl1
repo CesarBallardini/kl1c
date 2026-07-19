@@ -1,0 +1,5 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+o(normal(St)) :- St=[putt(x), nl, fflush(R)], collect(R,St2).
+collect(_,_):-true|true.

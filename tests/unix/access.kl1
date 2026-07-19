@@ -1,0 +1,7 @@
+/* access(PATH, MODE, R): R=0 if the file exists/is accessible. Creates the file in /tmp
+ * (self-contained, not depending on system files).  Ref: KLIC.info "Unix Stream". */
+:- module main.
+main :- klicio:klicio([stdout(OutRes), write_open("/tmp/kacc.dat", WRes)]), go(OutRes, WRes).
+go(normal(Out), normal(WS)) :- WS=[putc(120), fclose(WAck)], chk(WAck, Out).
+chk(WAck, Out) :- wait(WAck) | unix:unix([access("/tmp/kacc.dat", 0, R)]), rep(R, Out).
+rep(R, Out) :- Out=[putt(access(R)), nl].

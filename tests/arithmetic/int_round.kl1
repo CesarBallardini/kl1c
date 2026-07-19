@@ -1,0 +1,5 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+/* int(F) truncates toward ZERO (does not round).  Ref: KLIC.info "Integer Arith". */
+o(normal(St)) :- A:=int(3.9), B:=int(-3.9), C:=int(3.1), D:=int(-3.1), St=[putt([A,B,C,D]), nl].

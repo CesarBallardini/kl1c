@@ -1,0 +1,13 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+/* Float comparison: less_than equal greater_than not_equal not_greater_than not_less_than.
+ * Ref: KLIC.info "Floating Comp". */
+o(normal(St)) :- lt(1.0,2.0,R1), eq(3.0,3.0,R2), gt(5.0,1.0,R3),
+    ne(1.0,2.0,R4), ngt(1.0,2.0,R5), nlt(2.0,1.0,R6), St=[putt([R1,R2,R3,R4,R5,R6]), nl].
+lt(X,Y,R)  :- generic:less_than(X,Y)         | R=yes.
+eq(X,Y,R)  :- generic:equal(X,Y)             | R=yes.
+gt(X,Y,R)  :- generic:greater_than(X,Y)      | R=yes.
+ne(X,Y,R)  :- generic:not_equal(X,Y)         | R=yes.
+ngt(X,Y,R) :- generic:not_greater_than(X,Y)  | R=yes.
+nlt(X,Y,R) :- generic:not_less_than(X,Y)     | R=yes.

@@ -1,0 +1,6 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+/* Predicate object: constant predicate#(MOD:NAME/ARITY), generic:arity and generic:name.
+ * Ref: KLIC.info "Predicate Type". */
+o(normal(St)) :- P = predicate#(main:o/1), generic:arity(P, A), generic:name(P, N), St=[putt(pred(N,A)), nl].

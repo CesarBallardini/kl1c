@@ -1,0 +1,5 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+/* functor/3 and arg/3 (body form).  Ref: KLIC.info "Functor Operation". */
+o(normal(St)) :- functor(foo(a,b,c),F,N), arg(2,foo(a,b,c),A), St=[putt(r(F,N,A)), nl].

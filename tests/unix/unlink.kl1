@@ -1,0 +1,6 @@
+/* unlink(PATH, R): removes a file; R=0 if OK. Creates and removes in /tmp.  Ref: KLIC.info "Unix Stream". */
+:- module main.
+main :- klicio:klicio([stdout(OutRes), write_open("/tmp/kdel.txt", WRes)]), go(OutRes, WRes).
+go(normal(Out), normal(WS)) :- WS=[putc(120), fclose(WAck)], del(WAck, Out).
+del(WAck, Out) :- wait(WAck) | unix:unix([unlink("/tmp/kdel.txt", R)]), rep(R, Out).
+rep(R, Out) :- Out=[putt(unlink(R)), nl].

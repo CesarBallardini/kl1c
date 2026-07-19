@@ -1,0 +1,5 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+/* =/2 (unification) and putt of several types.  Ref: KLIC.info "Unification"/"Prolog I/O". */
+o(normal(St)) :- X=hello, St=[putt(X), nl, putt(42), nl, putt([1,2,3]), nl, putt(foo(1,2)), nl].

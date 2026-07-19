@@ -1,0 +1,5 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+o(normal(St)) :- X = ready, w(X, R), St=[putt(R), nl].
+w(X,R) :- wait(X) | R=X.

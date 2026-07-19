@@ -1,0 +1,9 @@
+# klic byproducts (KL1 -> C -> executable), regenerable. Scope: this directory and
+# subdirectories. The executables (no extension) are removed by `make distclean`.
+*.c
+*.h
+*.o
+*.ext
+klic.db
+work*
+core

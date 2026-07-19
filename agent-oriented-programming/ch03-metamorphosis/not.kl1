@@ -1,0 +1,23 @@
+/*
+ * Logical NOT gate as a set of guarded clauses.
+ *
+ * Illustrates the core of GDC (Ch. 3 "Metamorphosis"): committed choice among
+ * clauses whose guard examines the input. The call suspends until 'In' is
+ * sufficiently instantiated to satisfy some clause's guard.
+ *
+ * Output via 'klicio' + 'putt' (the method documented in the KLIC manual and
+ * used by the KLIC distribution examples). Note: 'builtin:print' used to crash
+ * on compound terms in this build, now fixed by debian/patch6.print-varargs;
+ * 'putt' remains the canonical method. 'io:outstream' is not a documented KLIC
+ * builtin.
+ */
+
+:- module main.
+
+main :- klicio:klicio([stdout(Res)]), check_stream(Res).
+
+check_stream(normal(St)) :- not(0, X), St = [putt(X), nl].
+check_stream(abnormal).
+
+not(In, Out) :- In = 0 | Out = 1.
+not(In, Out) :- In = 1 | Out = 0.

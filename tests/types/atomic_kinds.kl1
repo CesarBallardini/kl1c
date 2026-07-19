@@ -1,0 +1,17 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+/* atomic/1 is true only for integers and symbolic atoms; FALSE for floats,
+ * strings and vectors (they are generic objects).  Ref: KLIC.info "Atomic Data".
+ * NOTE (klic bug): applying atomic/float/string/vector to a LITERAL float/string/vector
+ * (e.g. `atomic(1.5)`) CRASHES the kl1cmp compiler; that is why the value is passed by
+ * a variable (`af(1.5,R) :- atomic(X)...`). */
+o(normal(St)) :- af(1.5,R1), as("x",R2), av({a},R3), ai(42,R4), aa(sym,R5), St=[putt([R1,R2,R3,R4,R5]), nl].
+af(X,R) :- atomic(X) | R=atomic.
+af(X,R) :- float(X)  | R=not_atomic.
+as(X,R) :- atomic(X) | R=atomic.
+as(X,R) :- string(X,_,_) | R=not_atomic.
+av(X,R) :- atomic(X) | R=atomic.
+av(X,R) :- vector(X,_) | R=not_atomic.
+ai(X,R) :- atomic(X) | R=atomic.
+aa(X,R) :- atomic(X) | R=atomic.

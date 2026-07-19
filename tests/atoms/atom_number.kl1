@@ -1,0 +1,5 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+o(normal(St)) :- atom_table:atom_number(hello, N), num(N, R), St=[putt(R), nl].
+num(N,R) :- integer(N) | R=is_integer.

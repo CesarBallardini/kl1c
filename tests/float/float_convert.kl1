@@ -1,0 +1,6 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+/* int<->float conversion: int(F) in :=, generic:new(float,_,I) for int->float.
+ * (There is no implicit conversion; see KLIC.info "Atomic Data".) */
+o(normal(St)) :- I:=int(3.9), generic:new(float,F,7), St=[putt([I,F]), nl].

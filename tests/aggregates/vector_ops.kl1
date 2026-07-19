@@ -1,0 +1,7 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+/* Vectors: {..} notation, generic:element/size/set_element.  Ref: KLIC.info "Vectors". */
+o(normal(St)) :- v({a,b,c,d}, E, L, V2), St=[putt([E,L,V2]), nl].
+v(V,E,L,V2) :- true |
+    generic:element(V,1,E), generic:size(V,L), generic:set_element(V,2,z,V2).

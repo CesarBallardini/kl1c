@@ -1,0 +1,6 @@
+/* unix:unix([...]) message list; system returns the raw wait() status
+ * (on Linux: exit_code << 8, low byte = signal). The code is extracted with >>8.
+ * Ref: KLIC.info "Unix Stream". */
+:- module main.
+main :- klicio:klicio([stdout(OutRes)]), unix:unix([system("true", R0), system("sh -c \"exit 3\"", R3)]), go(OutRes, R0, R3).
+go(normal(Out), R0, R3) :- E0 := R0 >> 8, E3 := R3 >> 8, Out=[putt([E0,E3]), nl].

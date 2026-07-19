@@ -1,0 +1,7 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+/* hash/2 (guard): deterministic hash of a term.  Ref: KLIC.info "Comparison and Hashing". */
+o(normal(St)) :- h(foo(1,2), R), St=[putt(R), nl].
+h(T,R) :- hash(T,H1), hash(T,H2), H1 =:= H2 | R=deterministic.
+h(T,R) :- hash(T,H1), hash(T,H2), H1 =\= H2 | R=nondeterministic.

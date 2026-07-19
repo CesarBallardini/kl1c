@@ -1,0 +1,10 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+/* Float arithmetic and comparison with infix $ operators.  Ref: KLIC.info "Floating Arith"/"Comp".
+ *   $:= (assignment), $< $=:= $> (comparison). */
+o(normal(St)) :- A $:= 2.0 * 3.0, B $:= 10.0 / 4.0, C $:= pow(2.0,10.0),
+    lt(1.0,2.0,R1), eq(2.0,2.0,R2), gt(3.0,1.0,R3), St=[putt([A,B,C,R1,R2,R3]), nl].
+lt(X,Y,R) :- X $<   Y | R=lt.
+eq(X,Y,R) :- X $=:= Y | R=eq.
+gt(X,Y,R) :- X $>   Y | R=gt.

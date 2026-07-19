@@ -1,0 +1,7 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+o(normal(St)) :- ne(1.0,2.0,R1), le(2.0,2.0,R2), ge(3.0,1.0,R3), St=[putt([R1,R2,R3]), nl].
+ne(X,Y,R) :- X $=\= Y | R=ne.
+le(X,Y,R) :- X $=<  Y | R=le.
+ge(X,Y,R) :- X $>=  Y | R=ge.

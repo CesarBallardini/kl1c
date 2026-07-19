@@ -1,0 +1,7 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+/* Floating-point arithmetic (generic: methods).  Ref: KLIC.info "Floating Arith". */
+o(normal(St)) :- generic:add(1.5,2.5,A), generic:subtract(5.0,2.0,B),
+    generic:multiply(3.0,4.0,C), generic:divide(10.0,4.0,D), generic:sqrt(9.0,E),
+    St=[putt([A,B,C,D,E]), nl].

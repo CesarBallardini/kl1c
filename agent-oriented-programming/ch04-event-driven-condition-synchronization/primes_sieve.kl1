@@ -1,0 +1,57 @@
+/*
+ * Sieve of Eratosthenes over streams.
+ *
+ * Source: Huntbach & Ringwood, "Agent-Oriented Programming: From Prolog to
+ *   Guarded Definite Clauses", Ch. 4 "Event Driven Condition Synchronization",
+ *   section 4.1 "Streams for Free" (printed pp. 104-105; PDF pp. 224-225).
+ *
+ * Archetypal streams example (Kahn & McQueen 1977): natNums generates the stream
+ * 2..Limit; sieve takes the first number as prime and chains a 'filter' that
+ * removes its multiples; the rest is sieved again. In GDC everything runs
+ * concurrently: sieve starts as soon as its 1st argument becomes a list.
+ *
+ * --- Prolog version from the book (Clocksin & Mellish 1981) ---
+ *   primes(Limit,Ps) :- natNums(2,Limit,Ns), sieve(Ns,Ps).
+ *   natNums(Low,High,[]) :- Low>High, !.
+ *   natNums(Low,High,[Low|Rest]) :- Low=<High, !, M:=Low+1, natNums(M,High,Rest).
+ *   sieve([],[]).
+ *   sieve([P|Ns],[P|Ps]) :- filter(P,Ns,Fs), sieve(Fs,Ps).
+ *   filter(P,[],[]).
+ *   filter(P,[N|Ns],[N|Fs]) :- 0=/=NmodP, !, filter(P,Ns,Fs).
+ *   filter(P,[N|Ns],Fs)     :- 0=:=NmodP, !, filter(P,Ns,Fs).
+ *
+ * --- GDC version from the book (verbatim) ---
+ *   primes(Limit,Ps) :- true | natNums(2,Limit,Ns), sieve(Ns,Ps).
+ *   natNums(Low,High,Ns) :- Low>High | Ns=[].
+ *   natNums(Low,High,Ns) :- Low=<High, M:=Low+1 | Ns=[Low|N1s], natNums(M,High,N1s).
+ *   sieve([],Ps)     :- true | Ps=[].
+ *   sieve([P|Ns],Ps) :- true | Ps=[P|P1s], filter(P,Ns,Fs), sieve(Fs,P1s).
+ *   filter(_,[],Fs)      :- true | Ps=[].          % book typo: should be Fs=[]
+ *   filter(P,[N|Ns],Fs)  :- 0=/=NmodP | Fs=[N|F1s], filter(P,Ns,F1s).
+ *   filter(P,[N|Ns],Fs)  :- 0=:=NmodP | filter(P,Ns,Fs).
+ *
+ * Adaptations for klic:
+ *   - '0=/=NmodP' -> '0 =\= N mod P'  and  '0=:=NmodP' -> '0 =:= N mod P'
+ *     (klic uses '=\=' for arithmetic "not equal" and 'mod' with spaces).
+ *   - typo 'Ps=[]' -> 'Fs=[]' in the base clause of filter.
+ *   - output via 'klicio' + 'putt'.
+ */
+
+:- module main.
+
+main :- klicio:klicio([stdout(S)]), out(S).
+
+out(normal(St)) :- primes(30, Ps), St = [putt(Ps), nl].
+out(abnormal).
+
+primes(Limit, Ps) :- true | natNums(2, Limit, Ns), sieve(Ns, Ps).
+
+natNums(Low, High, Ns) :- Low  > High | Ns = [].
+natNums(Low, High, Ns) :- Low =< High, M := Low + 1 | Ns = [Low|N1s], natNums(M, High, N1s).
+
+sieve([], Ps)      :- true | Ps = [].
+sieve([P|Ns], Ps)  :- true | Ps = [P|P1s], filter(P, Ns, Fs), sieve(Fs, P1s).
+
+filter(_, [], Fs)      :- true | Fs = [].
+filter(P, [N|Ns], Fs)  :- 0 =\= N mod P | Fs = [N|F1s], filter(P, Ns, F1s).
+filter(P, [N|Ns], Fs)  :- 0 =:= N mod P | filter(P, Ns, Fs).

@@ -1,0 +1,6 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+/* =../2 with a single numeric-element list -> the number; functor/3 of a vector -> the
+ * vector as the functor name, arity 0.  Ref: KLIC.info "Functor Operation". */
+o(normal(St)) :- functor_table:(N =.. [42]), functor({a,b}, F, Ar), St=[putt([N, f(F,Ar)]), nl].

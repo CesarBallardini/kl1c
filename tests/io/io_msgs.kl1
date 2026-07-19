@@ -1,0 +1,5 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+/* I/O messages on the klicio stream: putt, putc, nl, puttq.  Ref: KLIC.info "Prolog I/O". */
+o(normal(St)) :- St=[putt(hello), putc(32), putt([1,2,3]), nl, puttq(quoted), nl].

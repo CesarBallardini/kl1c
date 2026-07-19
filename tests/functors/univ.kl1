@@ -1,0 +1,5 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+/* =../2 (univ): builds a functor from a list.  Ref: KLIC.info "Functor Operation". */
+o(normal(St)) :- functor_table:(T =.. [foo,1,2]), St=[putt(T), nl].

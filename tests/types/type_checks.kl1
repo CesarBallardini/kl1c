@@ -1,0 +1,12 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+/* Type guards: atom integer float list atomic.  Ref: KLIC.info type sections. */
+o(normal(St)) :- t(foo,R1), t(42,R2), t(1.5,R3), t([1,2],R4), a(foo,R5), a([1],R6),
+    St=[putt([R1,R2,R3,R4,R5,R6]), nl].
+t(X,R) :- atom(X)    | R=atom.
+t(X,R) :- integer(X) | R=integer.
+t(X,R) :- float(X)   | R=float.
+t(X,R) :- list(X)    | R=list.
+a(X,R) :- atomic(X)  | R=atomic.
+a(X,R) :- list(X)    | R=nonatomic.

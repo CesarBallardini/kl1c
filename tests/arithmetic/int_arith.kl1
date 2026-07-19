@@ -1,0 +1,6 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+/* := with + - * / mod and parentheses.  Ref: KLIC.info "Integer Arith". */
+o(normal(St)) :- A:=7+3, B:=7-3, C:=7*3, D:=7/3, E:=7 mod 3, F:=2*(3+4),
+    St=[putt([A,B,C,D,E,F]), nl].

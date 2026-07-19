@@ -1,0 +1,4 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+o(normal(St)) :- A := 0 - 5, B := +(7), C := 5 mod 3, St=[putt([A,B,C]), nl].

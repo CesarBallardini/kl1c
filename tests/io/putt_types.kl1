@@ -1,0 +1,4 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+o(normal(St)) :- St=[putt(atom), nl, putt(123), nl, putt(1.5), nl, putt({v1,v2}), nl, putt("str"), nl].

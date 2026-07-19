@@ -1,0 +1,4 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+o(normal(St)) :- true | generic:new(merge, {S1,S2}, Merged), S1=[a], S2=[b], St=[putt(merged), nl].

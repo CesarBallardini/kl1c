@@ -1,0 +1,4 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+o(normal(St)) :- true | generic:size({}, VL), generic:string("", SL, _), St=[putt([VL,SL]), nl].

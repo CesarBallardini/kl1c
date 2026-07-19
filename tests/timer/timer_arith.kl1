@@ -1,0 +1,8 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+/* timer:add/sub/compare over time/3 structures (deterministic with fixed values).
+ * (get_time_of_day / instantiate_* depend on the clock -> non-deterministic -> not tested.)
+ * Ref: KLIC.info "Timer". */
+o(normal(St)) :- timer:add(time(1,0,0), time(2,0,0), Sum), timer:sub(time(5,0,0), time(2,0,0), Diff),
+    timer:compare(time(1,0,0), time(2,0,0), C), St=[putt([Sum,Diff,C]), nl].

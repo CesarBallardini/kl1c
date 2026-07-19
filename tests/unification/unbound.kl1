@@ -1,0 +1,5 @@
+:- module main.
+main :- klicio:klicio([stdout(S)]), o(S).
+o(abnormal).
+/* unbound/2 (body): if the top of X is bound, RESULT = {X}.  Ref: KLIC.info "Execution Status". */
+o(normal(St)) :- unbound(hello, R), St=[putt(R), nl].

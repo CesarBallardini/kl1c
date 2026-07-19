@@ -1,0 +1,4 @@
+/* cd(PATH, R): changes the process working directory; R=0 if OK.  Ref: KLIC.info "Unix Stream". */
+:- module main.
+main :- klicio:klicio([stdout(OutRes)]), unix:unix([cd("/tmp", R)]), go(OutRes, R).
+go(normal(Out), R) :- Out=[putt(cd(R)), nl].
